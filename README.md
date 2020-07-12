@@ -34,7 +34,7 @@ If the app gives any problems you may have to run the server manually:
 
 If the app keeps giving problems stop the command both in frontend and backend folder pressing ctrl + c and try to run again the commands in the backend/frontend folder in different order, for example this time run first `npm start` in frontend folder and then `nodemon server` in backend folder.
 
-P.S = 
+P.S. = 
 Environment:
 Windows 10 Home
 Visual Studio Code
