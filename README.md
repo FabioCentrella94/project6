@@ -9,8 +9,8 @@ In order to test the app you must have node installed, if you don't have it foll
 1. Clone this repo; 
 
 2. Run the file:
-    1. `setup_windows.bat` if you are on Windows;
-    2. `setup_mac_and_linux` if you are on Mac or Linux.
+    a. `setup_windows.bat` if you are on Windows;
+    b. `setup_mac_and_linux` if you are on Mac or Linux.
 
 
 If you have any problems to run the files:
