@@ -1,0 +1,9 @@
+#!/bin/bash
+
+scriptdir="$(dirname "$0")"
+
+(sudo npm install -g nodemon) &&
+
+(cd "$scriptdir" && cd frontend && npm install) &&
+
+(cd "$scriptdir" && cd backend && npm install)
