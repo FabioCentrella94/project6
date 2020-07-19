@@ -1,16 +1,16 @@
 const Sauce = require('../models/sauce')
-const fs = require('fs')
+const AWS = require('aws-sdk')
 
 exports.createSauce = (req, res, next) => {
   req.body.sauce = JSON.parse(req.body.sauce)
-  const url = req.protocol + '://' + req.get('host')
+  const url = 'https://sopekocko.s3.eu-west-2.amazonaws.com/'
   const sauce = new Sauce({
     userId: req.body.sauce.userId,
     name: req.body.sauce.name,
     manufacturer: req.body.sauce.manufacturer,
     description: req.body.sauce.description,
     mainPepper: req.body.sauce.mainPepper,
-    imageUrl: url + '/images/' + req.file.filename,
+    imageUrl: url + req.file.key,
     heat: req.body.sauce.heat,
     likes: 0,
     dislikes: 0,
@@ -45,62 +45,85 @@ exports.getOneSauce = (req, res, next) => {
     })
 }
 
-exports.modifySauce = (req, res, next) => {
-  let sauce = new Sauce({ _id: req.params._id })
-  if (req.file) {
-    const url = req.protocol + '://' + req.get('host')
-    req.body.sauce = JSON.parse(req.body.sauce)
-    sauce = {
-      _id: req.params.id,
-      userId: req.body.sauce.userId,
-      name: req.body.sauce.name,
-      manufacturer: req.body.sauce.manufacturer,
-      description: req.body.sauce.description,
-      mainPepper: req.body.sauce.mainPepper,
-      imageUrl: url + '/images/' + req.file.filename,
-      heat: req.body.sauce.heat
+exports.updateSauce = (req, res, next) => {
+  Sauce.findOne({ _id: req.params.id }).then(sauce => {
+    const s3 = new AWS.S3()
+    const params = {
+      Bucket: 'sopekocko',
+      Key: sauce.imageUrl.replace(
+        'https://sopekocko.s3.eu-west-2.amazonaws.com/',
+        ''
+      )
     }
-  } else {
-    sauce = {
-      _id: req.params.id,
-      userId: req.body.userId,
-      name: req.body.name,
-      manufacturer: req.body.manufacturer,
-      description: req.body.description,
-      mainPepper: req.body.mainPepper,
-      heat: req.body.heat
+    s3.deleteObject(params, function (err, data) {
+      if (err) console.log(err, err.stack)
+      else console.log()
+    })
+    sauce = new Sauce({ _id: req.params._id })
+    if (req.file) {
+      const url = 'https://sopekocko.s3.eu-west-2.amazonaws.com/'
+      req.body.sauce = JSON.parse(req.body.sauce)
+      sauce = {
+        _id: req.params.id,
+        userId: req.body.sauce.userId,
+        name: req.body.sauce.name,
+        manufacturer: req.body.sauce.manufacturer,
+        description: req.body.sauce.description,
+        mainPepper: req.body.sauce.mainPepper,
+        imageUrl: url + req.file.key,
+        heat: req.body.sauce.heat
+      }
+    } else {
+      sauce = {
+        _id: req.params.id,
+        userId: req.body.userId,
+        name: req.body.name,
+        manufacturer: req.body.manufacturer,
+        description: req.body.description,
+        mainPepper: req.body.mainPepper,
+        heat: req.body.heat
+      }
     }
-  }
 
-  Sauce.updateOne({ _id: req.params.id }, sauce)
-    .then(() => {
-      res.status(201).json({
-        message: 'Sauce updated successfully!'
+    Sauce.updateOne({ _id: req.params.id }, sauce)
+      .then(() => {
+        res.status(201).json({
+          message: 'Sauce updated successfully!'
+        })
       })
-    })
-    .catch(error => {
-      res.status(400).json({
-        error: error
+      .catch(error => {
+        res.status(400).json({
+          error: error
+        })
       })
-    })
+  })
 }
 
 exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id }).then(sauce => {
-    const filename = sauce.imageUrl.split('/images/')[1]
-    fs.unlink('images/' + filename, () => {
-      Sauce.deleteOne({ _id: req.params.id })
-        .then(() => {
-          res.status(200).json({
-            message: 'Sauce deleted successfully!'
-          })
-        })
-        .catch(error => {
-          res.status(400).json({
-            error: error
-          })
-        })
+    const s3 = new AWS.S3()
+    const params = {
+      Bucket: 'sopekocko',
+      Key: sauce.imageUrl.replace(
+        'https://sopekocko.s3.eu-west-2.amazonaws.com/',
+        ''
+      )
+    }
+    s3.deleteObject(params, function (err, data) {
+      if (err) console.log(err, err.stack)
+      else console.log('AWS: Image successfully deleted!')
     })
+    Sauce.deleteOne(sauce)
+      .then(() => {
+        res.status(200).json({
+          message: 'Sauce deleted successfully!'
+        })
+      })
+      .catch(error => {
+        res.status(400).json({
+          error: error
+        })
+      })
   })
 }
 
@@ -142,7 +165,7 @@ exports.likeDislikeSauce = (req, res, next) => {
       .save()
       .then(() => {
         res.status(200).json({
-          message: 'Preference Updated!' 
+          message: 'Preference Updated!'
         })
       })
       .catch(error => {

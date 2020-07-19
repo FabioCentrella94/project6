@@ -1,20 +1,23 @@
-const multer = require('multer');
+const aws = require('aws-sdk')
+const multer = require('multer')
+const multerS3 = require('multer-s3')
 
-const MIME_TYPES = {
-  'image/jpg': 'jpg',
-  'image/jpeg': 'jpg',
-  'image/png': 'png'
-};
+aws.config.update({
+  secretAccessKey: 'qGY4inl1701BlyB64YkrUpzrAYHb7ympTBDWybx3',
+  accessKeyId: 'AKIAIVGJODQ3773NM2LA',
+  region: 'eu-west-2'
+})
 
-const storage = multer.diskStorage({
-  destination: (req, file, callback) => {
-    callback(null, 'images');
-  },
-  filename: (req, file, callback) => {
-    const name = file.originalname.split(' ').join('_');
-    const extension = MIME_TYPES[file.mimetype];
-    callback(null, name + Date.now() + '.' + extension);
-  }
-});
+const s3 = new aws.S3()
 
-module.exports = multer({storage: storage}).single('image');
+const upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: 'sopekocko',
+    key: function (req, file, cb) {
+      cb(null, new Date().toISOString() + '-' + file.originalname)
+    }
+  })
+})
+
+module.exports = multer(upload).single('image')
