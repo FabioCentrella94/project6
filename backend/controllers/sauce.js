@@ -111,7 +111,7 @@ exports.deleteSauce = (req, res, next) => {
     }
     s3.deleteObject(params, function (err, data) {
       if (err) console.log(err, err.stack)
-      else console.log('AWS: Image successfully deleted!')
+      else console.log()
     })
     Sauce.deleteOne(sauce)
       .then(() => {
