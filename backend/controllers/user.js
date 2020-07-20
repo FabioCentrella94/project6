@@ -29,7 +29,7 @@ exports.login = (req, res, next) => {
     .then(user => {
       if (!user) {
         return res.status(401).json({
-          error: new Error('Incorrect password!')
+          error: new Error('User not found!')
         })
       }
       bcrypt
