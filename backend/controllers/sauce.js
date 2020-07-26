@@ -47,20 +47,20 @@ exports.getOneSauce = (req, res, next) => {
 
 exports.updateSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id }).then(sauce => {
-    const s3 = new AWS.S3()
-    const params = {
-      Bucket: 'sopekocko',
-      Key: sauce.imageUrl.replace(
-        'https://sopekocko.s3.eu-west-2.amazonaws.com/',
-        ''
-      )
-    }
-    s3.deleteObject(params, function (err, data) {
-      if (err) console.log(err, err.stack)
-      else console.log()
-    })
-    sauce = new Sauce({ _id: req.params._id })
     if (req.file) {
+      const s3 = new AWS.S3()
+      const params = {
+        Bucket: 'sopekocko',
+        Key: sauce.imageUrl.replace(
+          'https://sopekocko.s3.eu-west-2.amazonaws.com/',
+          ''
+        )
+      }
+      s3.deleteObject(params, function (err, data) {
+        if (err) console.log(err, err.stack)
+        else console.log()
+      })
+      
       const url = 'https://sopekocko.s3.eu-west-2.amazonaws.com/'
       req.body.sauce = JSON.parse(req.body.sauce)
       sauce = {
