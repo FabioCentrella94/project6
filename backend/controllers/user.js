@@ -1,5 +1,4 @@
 const bcrypt = require('bcrypt')
-const maskData = require('../node_modules/maskdata')
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 
