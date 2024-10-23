@@ -11,9 +11,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "browser-sync": "^3.0.3",
     "concurrently": "^6.0.0",
-    "http-server": "^0.12.3",
-    "live-server": "^1.2.1",
+    "http-server": "^14.1.1",
+    "live-server": "^1.2.0",
     "run-script-os": "^1.1.5"
   }
 }
