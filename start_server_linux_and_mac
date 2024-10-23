@@ -4,7 +4,7 @@ scriptdir="$(dirname "$0")"
 
 (cd "$scriptdir" && cd frontend && npm start) & 
 
-(cd "$scriptdir" && cd backend && nodemon server)
+(cd "$scriptdir" && cd backend && npx nodemon server)
  
 
 

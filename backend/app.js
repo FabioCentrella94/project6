@@ -1,13 +1,4 @@
-// MongoDb Password: 13%2FAgosto%2F94
-// MongoDb Name: Fabio
-// MongoDb Connection: mongodb+srv://Fabio:<password>@cluster0-iabbj.mongodb.net/<dbname>?retryWrites=true&w=majority
-
-// MongoDb Name: DatabaseAdmin
-// Password: 12345
-
-// MongoDb Name: TablesAdmin
-// Password: 12345
-
+require('dotenv').config()
 const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
@@ -19,8 +10,7 @@ const userRoutes = require('./routes/user')
 const app = express()
 
 mongoose
-  .connect(
-    'mongodb+srv://Fabio:13%2FAgosto%2F94@cluster0-iabbj.mongodb.net/SoPekocko?retryWrites=true&w=majority',
+  .connect(process.env.MONGO_DB_ATLAS_CONNECTION_STRING,
     { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(() => {

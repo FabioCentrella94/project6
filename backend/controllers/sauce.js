@@ -3,7 +3,7 @@ const AWS = require('aws-sdk')
 
 exports.createSauce = (req, res, next) => {
   req.body.sauce = JSON.parse(req.body.sauce)
-  const url = 'https://sopekocko.s3.eu-west-2.amazonaws.com/'
+  const url = 'https://hot-takes-01.s3.eu-west-2.amazonaws.com/'
   const sauce = new Sauce({
     userId: req.body.sauce.userId,
     name: req.body.sauce.name,
@@ -36,6 +36,11 @@ exports.getOneSauce = (req, res, next) => {
     _id: req.params.id
   })
     .then(sauce => {
+
+      let params = {Bucket: 'hot-takes-01', Key: sauce.imageUrl.replace("https://hot-takes-01.s3.eu-west-2.amazonaws.com/", ""), Expires: 3600};
+      const s3 = new AWS.S3()
+      const url = s3.getSignedUrl('getObject', params);
+      sauce.imageUrl = url
       res.status(200).json(sauce)
     })
     .catch(error => {
@@ -50,9 +55,9 @@ exports.updateSauce = (req, res, next) => {
     if (req.file) {
       const s3 = new AWS.S3()
       const params = {
-        Bucket: 'sopekocko',
+        Bucket: 'hot-takes-01',
         Key: sauce.imageUrl.replace(
-          'https://sopekocko.s3.eu-west-2.amazonaws.com/',
+          'https://hot-takes-01.s3.eu-west-2.amazonaws.com/',
           ''
         )
       }
@@ -61,7 +66,7 @@ exports.updateSauce = (req, res, next) => {
         else console.log()
       })
       
-      const url = 'https://sopekocko.s3.eu-west-2.amazonaws.com/'
+      const url = 'https://hot-takes-01.s3.eu-west-2.amazonaws.com/'
       req.body.sauce = JSON.parse(req.body.sauce)
       sauce = {
         _id: req.params.id,
@@ -103,9 +108,9 @@ exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id }).then(sauce => {
     const s3 = new AWS.S3()
     const params = {
-      Bucket: 'sopekocko',
+      Bucket: 'hot-takes-01',
       Key: sauce.imageUrl.replace(
-        'https://sopekocko.s3.eu-west-2.amazonaws.com/',
+        'https://hot-takes-01.s3.eu-west-2.amazonaws.com/',
         ''
       )
     }
@@ -130,7 +135,19 @@ exports.deleteSauce = (req, res, next) => {
 exports.getAllSauce = (req, res, next) => {
   Sauce.find()
     .then(sauces => {
-      res.status(200).json(sauces)
+
+      let presignedUrls = (array) => {
+        let arraypresignedUrls = [];
+        if (array.length < 1) return array;
+        let params = { Bucket: 'hot-takes-01', Key: array[0].imageUrl.replace("https://hot-takes-01.s3.eu-west-2.amazonaws.com/", ""), Expires: 3600};
+        const s3 = new AWS.S3();
+        const url = s3.getSignedUrl('getObject', params);
+        array[0].imageUrl = url;
+        arraypresignedUrls.push(array[0])
+        return arraypresignedUrls = arraypresignedUrls.concat(presignedUrls(array.slice(1)))
+      }
+      
+      res.status(200).json(presignedUrls(sauces))
     })
     .catch(error => {
       res.status(400).json({
