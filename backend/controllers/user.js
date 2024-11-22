@@ -1,63 +1,63 @@
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
-const User = require('../models/user')
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 
 exports.signup = (req, res, next) => {
-  bcrypt.hash(req.body.password, 10).then(hash => {
+  bcrypt.hash(req.body.password, 10).then((hash) => {
     const user = new User({
       email: req.body.email,
-      password: hash
-    })
+      password: hash,
+    });
     user
       .save()
       .then(() => {
         res.status(201).json({
-          message: 'User added successfully!'
-        })
+          message: "User added successfully!",
+        });
       })
-      .catch(error => {
+      .catch((error) => {
         res.status(500).json({
-          error: error
-        })
-      })
-  })
-}
+          error: error,
+        });
+      });
+  });
+};
 
 exports.login = (req, res, next) => {
-  User.findOne({ email: req.body.email})
-    .then(user => {
+  User.findOne({ email: req.body.email })
+    .then((user) => {
       if (!user) {
         return res.status(401).json({
-          error: new Error('User not found!')
-        })
+          error: new Error("User not found!"),
+        });
       }
       bcrypt
         .compare(req.body.password, user.password)
-        .then(valid => {
+        .then((valid) => {
           if (!valid) {
             return res.status(401).json({
-              error: new Error('Incorrect password!')
-            })
+              error: new Error("Incorrect password!"),
+            });
           }
           const token = jwt.sign(
             { userId: user._id },
-            'FKDAFJKA775JKJFDKAnfamnkjfka-fadfajk',
-            { expiresIn: '24h' }
-          )
+            process.env.JWT_SECRET_KEY,
+            { expiresIn: "24h" }
+          );
           res.status(200).json({
             userId: user._id,
-            token: token
-          })
+            token: token,
+          });
         })
-        .catch(error => {
+        .catch((error) => {
           res.status(500).json({
-            error: error
-          })
-        })
+            error: error,
+          });
+        });
     })
-    .catch(error => {
+    .catch((error) => {
       res.status(500).json({
-        error: error
-      })
-    })
-}
+        error: error,
+      });
+    });
+};
