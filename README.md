@@ -3,9 +3,8 @@
 For this project I've built only the backend to serve APIs for the frontend. I've used Node.js, Express, MongoDB.
 <br/>
 Deployed both frontend and backend on AWS using Elastic Beanstalk, S3, CloudFront, Route53, IAM.
-
-## Usage ##
-
+<br/>
+<br/>
 The user can:
 
 - Register and login;
