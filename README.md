@@ -1,4 +1,4 @@
-# BACKEND API #
+# SECURE BACKEND API #
 
 For this project I've built only the backend to serve APIs for the frontend. I've used Node.js, Express, MongoDB.
 <br/>
