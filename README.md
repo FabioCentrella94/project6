@@ -1,6 +1,8 @@
 # SECURE BACKEND API #
 
-Secure backend to serve APIs to frontend.
+For this project I've built only the backend to serve APIs for the frontend. I've used Node.js, Express and MongoDB.
+<br/>
+Deployed both frontend and backend on AWS using Elastic Beanstalk, S3 and CloudFront.
 <br/>
 <br/>
 The user can:
